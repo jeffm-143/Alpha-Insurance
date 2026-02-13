@@ -84,7 +84,6 @@ function Menu() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
   const [clearFormConfirm, setClearFormConfirm] = useState(false);
-  const [touched, setTouched] = useState({});
   const [ratesData, setRatesData] = useState(() => {
     try {
       const savedRatesData = localStorage.getItem('menuRatesData');
@@ -150,11 +149,7 @@ function Menu() {
   };
 
   const handleBlur = (e) => {
-    const { name } = e.target;
-    setTouched(prev => ({
-      ...prev,
-      [name]: true
-    }));
+    // Intentionally empty - touched state tracking not needed
   };
 
   const handleBack = () => {
@@ -190,25 +185,25 @@ function Menu() {
       
       try {
         const policyData = {
-          assured: formData.assured,
-          address: formData.address,
-          coc_number: formData.cocNumber,
-          or_number: formData.orNumber,
-          policy_number: formData.policyNumber,
-          policy_type: formData.cType,
-          policy_year: parseInt(formData.year) || new Date().getFullYear(),
+          assured: formData.assured || '',
+          address: formData.address || '',
+          coc_number: formData.cocNumber || '',
+          or_number: formData.orNumber || '',
+          policy_number: formData.policyNumber || '',
+          policy_type: formData.cType || '',
+          policy_year: formData.year ? parseInt(formData.year) : new Date().getFullYear(),
           date_issued: formData.dateIssued || null,  
           date_received: formData.dateReceived || null,
           insurance_from_date: formData.insuranceFromDate || null,
           insurance_to_date: formData.insuranceToDate || null,
-          model: formData.model,
-          make: formData.make,
-          body_type: formData.bodyType,
-          color: formData.color,
-          mv_file_no: formData.mvFileNo,
-          plate_no: formData.plateNo,
-          chassis_no: formData.serialChassisNo,
-          motor_no: formData.motorNo,
+          model: formData.model || '',
+          make: formData.make || '',
+          body_type: formData.bodyType || '',
+          color: formData.color || '',
+          mv_file_no: formData.mvFileNo || '',
+          plate_no: formData.plateNo || '',
+          chassis_no: formData.serialChassisNo || '',
+          motor_no: formData.motorNo || '',
           premium: parseFloat(ratesData.premium) || 0,
           other_charges: parseFloat(ratesData.otherCharges) || 0,
           auth_fee: 50.40
@@ -227,7 +222,9 @@ function Menu() {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorData = await response.json().catch(() => ({}));
+          console.error('API Error Response:', errorData);
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
 
         const result = await response.json();
@@ -304,7 +301,6 @@ function Menu() {
         weightClass: '',
       };
       setFormData(emptyFormData);
-      setTouched({});
       localStorage.removeItem('menuFormData');
       showToast('Form cleared successfully', 'success');
       setClearFormConfirm(false);

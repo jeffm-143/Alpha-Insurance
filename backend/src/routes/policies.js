@@ -88,14 +88,6 @@ router.post('/', async (req, res) => {
       }
     });
 
-    // Validate required fields
-    if (!assured || !coc_number || !or_number) {
-      return res.status(400).json({
-        success: false,
-        message: 'Required fields missing: assured, coc_number, or_number'
-      });
-    }
-
     // Calculate rates
     const premiumNum = parseFloat(premium) || 0;
     const otherChargesNum = parseFloat(other_charges) || 0;
